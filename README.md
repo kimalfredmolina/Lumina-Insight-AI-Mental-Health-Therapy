@@ -1,4 +1,4 @@
-# Recipe Generate
+# AI Recipe Generator
 
 ### Recipe Finder/Generate with Artificial Intelligence API
 
