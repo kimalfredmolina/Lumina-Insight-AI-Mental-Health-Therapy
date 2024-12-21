@@ -3,6 +3,7 @@ import { GiSpeaker } from "react-icons/gi";
 import { GoPaperclip } from "react-icons/go";
 import { FaArrowCircleUp } from "react-icons/fa";
 import { IoMdHome } from "react-icons/io";
+import { Link } from "react-router-dom"; 
 
 function Generate() {
   const [inputText, setInputText] = useState("");
@@ -10,14 +11,12 @@ function Generate() {
   const [showFileInput, setShowFileInput] = useState(false);
   const [showIcons, setShowIcons] = useState(true);
 
-  const handleGenerateRecipe = () => {
-  };
+  const handleGenerateRecipe = () => {};
   const handleRespose = () => {
     alert("You pressed Enter");
   };
 
   const handleVoiceInput = () => {
-    // Handle voice input
     alert("Voice Input clicked");
   };
 
@@ -36,15 +35,13 @@ function Generate() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      {/* Container */}
-      <div className="max-w-7xl mx-auto bg-gray-200 shadow-md rounded-lg p-4 flex">
-        {/* Sidebar */}
+    <div className="h-screen w-screen p-4 flex justify-center items-center ">
+      <div className="max-w-7xl w-full h-full bg-gray-200 shadow-md rounded-lg p-4 flex">
         <div className="flex flex-col items-center w-1/3 p-4">
           <div className="w-full flex justify-start mb-4">
-            <a href="/Home" className="p-2 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400">
+            <Link to="/" className="p-2 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400">
               <IoMdHome className="h-6 w-6" />
-            </a>
+            </Link>
           </div>
           <img
             src="/src/assets/app_logo.png"
@@ -53,23 +50,18 @@ function Generate() {
           />
           <h1 className="text-2xl font-bold text-gray-800 text-center">AI Recipe Finder</h1>
           <p className="text-gray-600 text-center mt-2">
-            Generate your Recipe here <br></br>by inserting a photo or text.
+            Generate your Recipe here <br /> by inserting a photo or text.
           </p>
         </div>
-
-        {/* Main Content */}
-        <div className="w-2/3">
-          <div className="bg-gray-50 border rounded-lg p-4 space-y-2 mb-4 flex flex-col h-[550px]">
-            {/* Chat Content (Messages) */}
+        <div className="w-2/3 h-full flex flex-col">
+          <div className="bg-gray-50 border rounded-lg p-4 flex flex-col flex-grow">
             <div className="flex-grow overflow-auto">
-              {/* User Input */}
               <div className="flex justify-end">
                 <div className="bg-gray-200 rounded-lg p-2 max-w-sm">
                   <p className="text-gray-800">Can you give me recipe for chicken</p>
                 </div>
               </div>
 
-              {/* AI Response */}
               {response && (
                 <div className="flex items-start space-x-2">
                   <div className="self-end">
@@ -88,16 +80,11 @@ function Generate() {
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-2 font-semibold text-gray-600">
-                      Enjoy your delicious Garlic Butter Chicken!
-                    </p>
                   </div>
                 </div>
               )}
             </div>
 
-
-            {/* Input Box */}
             <div className="flex items-center space-x-2 mt-4">
               <input
                 type="text"
@@ -118,8 +105,6 @@ function Generate() {
             </div>
           </div>
 
-
-          {/* Icons (appear when input is focused) */}
           {showIcons && !showFileInput && (
             <div className="mt-2 flex space-x-2">
               <button
