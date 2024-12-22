@@ -129,7 +129,7 @@ function ChatbotPage() {
                 }`}
               >
                 <div
-                  className={`p-8 rounded-lg mb-4 ${
+                  className={`p-4 rounded-lg mb-4 ${
                     message.sender === "user"
                       ? "bg-blue-200 text-right"
                       : "bg-green-200 text-left"
