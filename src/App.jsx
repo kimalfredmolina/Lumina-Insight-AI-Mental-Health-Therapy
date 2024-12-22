@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from "./components/Home";
-import Generate from './components/Generate';
+import ChatbotPage from './components/ChatbotPage';
 
 const App = () => {
   return (
@@ -14,7 +14,7 @@ const App = () => {
               <Home />
             </div>
           } />
-          <Route path="/generate" element={<Generate />} />
+          <Route path="/bot" element={<ChatbotPage/>} />
         </Routes>
       </div>
     </Router>

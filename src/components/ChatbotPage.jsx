@@ -4,7 +4,6 @@ import { GoPaperclip } from "react-icons/go";
 import { FaArrowCircleUp } from "react-icons/fa";
 import { IoMdHome } from "react-icons/io";
 import { Link } from "react-router-dom";
-import MDEditor from "@uiw/react-md-editor";
 import dayjs from "dayjs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -12,7 +11,7 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-function Generate() {
+function ChatbotPage() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,12 +19,46 @@ function Generate() {
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
-    // Auto-scroll to the bottom of the chat container
     chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
   }, [messages]);
 
+  const mentalHealthKeywords = [
+    "anxiety",
+    "depression",
+    "stress",
+    "mental health",
+    "therapy",
+    "counseling",
+    "well-being",
+    "emotions",
+    "feeling",
+    "sad",
+    "happy",
+    "overwhelmed",
+    "burnout",
+  ];
+
+  const isMentalHealthRelated = (text) => {
+    return mentalHealthKeywords.some((keyword) =>
+      text.toLowerCase().includes(keyword)
+    );
+  };
+
   const handleResponse = async () => {
     if (!inputText.trim()) return;
+
+    if (!isMentalHealthRelated(inputText)) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
+          sender: "ai",
+          timestamp: new Date(),
+        },
+      ]);
+      setInputText("");
+      return;
+    }
 
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -47,7 +80,7 @@ function Generate() {
         },
       ]);
     } catch (err) {
-      setError("Failed to generate recipe. Please try again.");
+      setError("Failed to process your message. Please try again.");
     } finally {
       setLoading(false);
       setInputText("");
@@ -68,15 +101,15 @@ function Generate() {
             </Link>
           </div>
           <img
-            src="/src/assets/app_logo.png"
-            alt="Chef Icon"
+            src="/src/assets/web_logo.jpeg"
+            alt="AI Companion Icon"
             className="w-80 h-80 rounded-3xl object-cover mb-4"
           />
           <h1 className="text-2xl font-bold text-gray-800 text-center">
-            AI Recipe Finder
+            AI Mental Health Companion
           </h1>
           <p className="text-gray-600 text-center mt-2">
-            Generate your Recipe here <br /> by inserting a photo or text.
+            Talk with your AI counselor <br /> and find clarity and support.
           </p>
         </div>
 
@@ -131,13 +164,13 @@ function Generate() {
             </button>
 
             <textarea
-              placeholder="Type your question here..."
+              placeholder="Share your thoughts or concerns..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  handleResponse(); 
+                  handleResponse();
                 }
               }}
               className="flex-grow p-2 border-none resize-none h-12 bg-transparent focus:outline-none"
@@ -146,7 +179,8 @@ function Generate() {
             <button
               onClick={handleResponse}
               className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              aria-label="Send Message">
+              aria-label="Send Message"
+            >
               <FaArrowCircleUp className="h-6 w-6" />
             </button>
           </div>
@@ -156,4 +190,4 @@ function Generate() {
   );
 }
 
-export default Generate;
+export default ChatbotPage;
