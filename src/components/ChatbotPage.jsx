@@ -6,15 +6,29 @@ import { IoMdHome } from "react-icons/io";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+//ano tong import na to? nawawala yung mga design eh
+// import { send } from "vite";
+// import { text } from "framer-motion/client";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+// const genAI = new GoogleGenerativeAI(API_KEY);
+// const model = genAI.getGenerativeModel({
+//   model: "gemini-1.5-flash",
+//   systemInstruction:
+//     "You are Lumina, a compassionate and empathetic therapist. Your role is to actively listen to the patient, validate their emotions, and provide thoughtful, supportive, and practical feedback. Speak in a warm, understanding tone that helps the patient feel safe, heard, and respected. As a therapist, focus on creating a nonjudgmental space for them to express themselves while offering helpful insights or strategies tailored to their needs. also talk to me like a human would talk, specifically casual talk.",
+// });
+// const chat = model.startChat({
+//   history: [],
+//   generationConfig: {
+//     maxOutputTokens: 500,
+//   },
+// });
 
 function ChatbotPage() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [chat, setChat] = useState(null);
   const [error, setError] = useState(null);
   const chatContainerRef = useRef(null);
 
@@ -38,6 +52,49 @@ function ChatbotPage() {
     "burnout",
   ];
 
+  useEffect(() => {
+    const sessionId = Date.now().toString();
+    localStorage.setItem("currentSessionId", sessionId);
+
+    initializeChat();
+
+    return () => {
+      localStorage.removeItem("currentSessionId");
+    };
+  }, []);
+
+  useEffect(() => {
+    const currentSessionId = localStorage.getItem("currentSessionId");
+    if (currentSessionId) {
+      localStorage.setItem(
+        `chatHistory-${currentSessionId}`,
+        JSON.stringify(messages)
+      );
+    }
+
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const initializeChat = (async) => {
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction:
+        "You are Lumina, a compassionate and empathetic therapist. Your role is to actively listen to the patient, validate their emotions, and provide thoughtful, supportive, and practical feedback. Speak in a warm, understanding tone that helps the patient feel safe, heard, and respected. As a therapist, focus on creating a nonjudgmental space for them to express themselves while offering helpful insights or strategies tailored to their needs. also talk to me like a human would talk, specifically casual talk.",
+    });
+
+    const newChat = model.startChat({
+      generationConfig: {
+        maxOutputTokens: 500,
+      },
+    });
+
+    setChat(newChat);
+  };
+
   const isMentalHealthRelated = (text) => {
     return mentalHealthKeywords.some((keyword) =>
       text.toLowerCase().includes(keyword)
@@ -45,34 +102,51 @@ function ChatbotPage() {
   };
 
   const handleResponse = async () => {
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !chat) return;
 
-    if (!isMentalHealthRelated(inputText)) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
-          sender: "ai",
-          timestamp: new Date(),
-        },
-      ]);
-      setInputText("");
-      return;
-    }
+    // if (!isMentalHealthRelated(inputText)) {
+    //   setMessages((prevMessages) => [
+    //     ...prevMessages,
+    //     {
+    //       text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
+    //       sender: "ai",
+    //       timestamp: new Date(),
+    //     },
+    //   ]);
+    //   setInputText("");
+    //   return;
+    // }
 
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { text: inputText, sender: "user", timestamp: new Date() },
-    ]);
+    const newMessage = {
+      text: inputText,
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    // setMessages((prevMessages) => [
+    //   ...prevMessages,
+    //   { text: inputText, sender: "user", timestamp: new Date() },
+    // ]);
+
+    setMessages((prev) => [...prev, newMessage]);
     setLoading(true);
     setError(null);
 
     try {
-      const result = await model.generateContent(inputText);
+      const result = await chat.sendMessage(inputText);
       const text = result.response.text();
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
+      // setMessages((prevMessages) => [
+      //   ...prevMessages,
+      //   {
+      //     text: text,
+      //     sender: "ai",
+      //     timestamp: new Date(),
+      //   },
+      // ]);
+
+      setMessages((prev) => [
+        ...prev,
         {
           text: text,
           sender: "ai",
@@ -81,6 +155,7 @@ function ChatbotPage() {
       ]);
     } catch (err) {
       setError("Failed to process your message. Please try again.");
+      await initializeChat();
     } finally {
       setLoading(false);
       setInputText("");
