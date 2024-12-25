@@ -1,6 +1,9 @@
-# AI Recipe Generator
+# Lumina AI Mental Health Companion
 
-### Recipe Finder/Generate with Artificial Intelligence API
+### Your Trusted Partner for Emotional Support and Guidance with AI Technology
+
+Discover a safe space where you can share your thoughts and feelings. Powered by advanced AI, our platform provides empathetic responses, helpful insights, and personalized support for your mental well-being. Whether you're seeking advice, clarity, or just someone to talk to, we're here for you 24/7.
+
 
 
 
