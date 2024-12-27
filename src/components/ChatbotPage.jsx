@@ -25,16 +25,14 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 // });
 
 function ChatbotPage() {
-  const [inputText, setInputText] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [chat, setChat] = useState(null);
-  const [error, setError] = useState(null);
-  const chatContainerRef = useRef(null);
-
-  useEffect(() => {
-    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-  }, [messages]);
+  const [inputText, setInputText] = useState(""); 
+  const [messages, setMessages] = useState([]); 
+  const [loading, setLoading] = useState(false); 
+  const [chat, setChat] = useState(null); 
+  const [error, setError] = useState(null); 
+  const chatContainerRef = useRef(null); 
+  const [isListening, setIsListening] = useState(false); 
+  const recognitionRef = useRef(null);
 
   const mentalHealthKeywords = [
     "anxiety",
@@ -51,6 +49,10 @@ function ChatbotPage() {
     "overwhelmed",
     "burnout",
   ];
+
+  useEffect(() => {
+    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+  }, [messages]);
 
   useEffect(() => {
     const sessionId = Date.now().toString();
@@ -162,9 +164,46 @@ function ChatbotPage() {
     }
   };
 
+  // for voice recognition
+  const startListening = () => {
+    if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US"; // Set language
+    recognition.interimResults = false; 
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => {
+      setIsListening(true); 
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript; 
+      setInputText(transcript); 
+      setIsListening(false); 
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      setIsListening(false); 
+    };
+
+    recognition.onend = () => {
+      setIsListening(false); 
+    };
+
+    recognition.start(); 
+  };
+
   return (
     <div className="h-screen w-screen p-4 flex justify-center items-center">
-      <div className="max-w-7xl w-full h-full bg-gray-200 shadow-md rounded-lg p-4 flex">
+      <div className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex">
         {/* Sidebar */}
         <div className="flex flex-col items-center w-1/3 p-4">
           <div className="w-full flex justify-start mb-4">
@@ -231,8 +270,12 @@ function ChatbotPage() {
               <GoPaperclip className="h-5 w-5" />
             </button>
             <button
-              onClick={() => alert("Voice input feature coming soon!")}
-              className="p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 mr-2"
+              onClick={startListening}
+              className={`p-2 rounded-lg mr-2 ${
+                isListening
+                  ? "bg-green-400 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
               aria-label="Voice Input"
             >
               <GiSpeaker className="h-5 w-5" />
