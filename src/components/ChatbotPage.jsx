@@ -25,13 +25,13 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 // });
 
 function ChatbotPage() {
-  const [inputText, setInputText] = useState(""); 
-  const [messages, setMessages] = useState([]); 
-  const [loading, setLoading] = useState(false); 
-  const [chat, setChat] = useState(null); 
-  const [error, setError] = useState(null); 
-  const chatContainerRef = useRef(null); 
-  const [isListening, setIsListening] = useState(false); 
+  const [inputText, setInputText] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [chat, setChat] = useState(null);
+  const [error, setError] = useState(null);
+  const chatContainerRef = useRef(null);
+  const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
   const mentalHealthKeywords = [
@@ -53,7 +53,7 @@ function ChatbotPage() {
   useEffect(() => {
     chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
   }, [messages]);
-
+  //time date function
   useEffect(() => {
     const sessionId = Date.now().toString();
     localStorage.setItem("currentSessionId", sessionId);
@@ -64,7 +64,7 @@ function ChatbotPage() {
       localStorage.removeItem("currentSessionId");
     };
   }, []);
-
+  //Time date function
   useEffect(() => {
     const currentSessionId = localStorage.getItem("currentSessionId");
     if (currentSessionId) {
@@ -80,7 +80,8 @@ function ChatbotPage() {
     }
   }, [messages]);
 
-  const initializeChat = (async) => {
+  //Limitation for prompting
+  const initializeChat = async () => {
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
@@ -138,23 +139,16 @@ function ChatbotPage() {
       const result = await chat.sendMessage(inputText);
       const text = result.response.text();
 
-      // setMessages((prevMessages) => [
-      //   ...prevMessages,
-      //   {
-      //     text: text,
-      //     sender: "ai",
-      //     timestamp: new Date(),
-      //   },
-      // ]);
+      const aiMessage = {
+        text: text,
+        sender: "ai",
+        timestamp: new Date(),
+      };
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: text,
-          sender: "ai",
-          timestamp: new Date(),
-        },
-      ]);
+      setMessages((prev) => [...prev, aiMessage]);
+
+      // Trigger the text-to-speech
+      textToSpeech(aiMessage.text);
     } catch (err) {
       setError("Failed to process your message. Please try again.");
       await initializeChat();
@@ -163,6 +157,45 @@ function ChatbotPage() {
       setInputText("");
     }
   };
+
+  // Text-to-Speech response of AI
+  const textToSpeech = (text) => {
+    if ("speechSynthesis" in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";   // Set language
+      utterance.rate = 1;         // Adjust speaking rate
+      utterance.pitch = 1;
+  
+      const setVoice = () => {
+        const voices = window.speechSynthesis.getVoices();
+  
+        const femaleVoice = voices.find((voice) =>
+          voice.lang.startsWith("en") &&
+          (voice.name.toLowerCase().includes("female") ||
+            voice.name.toLowerCase().includes("woman"))
+        );
+  
+        if (femaleVoice) {
+          utterance.voice = femaleVoice;
+        } else {
+          const fallbackVoice = voices.find((voice) => voice.lang.startsWith("en"));
+          if (fallbackVoice) {
+            utterance.voice = fallbackVoice;
+          }
+        }
+  
+        window.speechSynthesis.speak(utterance);
+        window.speechSynthesis.onvoiceschanged = null;
+      };
+      if (speechSynthesis.getVoices().length) {
+        setVoice();
+      } else {
+        window.speechSynthesis.onvoiceschanged = setVoice;
+      }
+    } else {
+      alert("Text-to-speech is not supported in this browser.");
+    }
+  };  
 
   // for voice recognition
   const startListening = () => {
@@ -176,29 +209,29 @@ function ChatbotPage() {
     const recognition = new SpeechRecognition();
 
     recognition.lang = "en-US"; // Set language
-    recognition.interimResults = false; 
+    recognition.interimResults = false;
     recognitionRef.current = recognition;
 
     recognition.onstart = () => {
-      setIsListening(true); 
+      setIsListening(true);
     };
 
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript; 
-      setInputText(transcript); 
-      setIsListening(false); 
+      const transcript = event.results[0][0].transcript;
+      setInputText(transcript);
+      setIsListening(false);
     };
 
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
-      setIsListening(false); 
+      setIsListening(false);
     };
 
     recognition.onend = () => {
-      setIsListening(false); 
+      setIsListening(false);
     };
 
-    recognition.start(); 
+    recognition.start();
   };
 
   return (
