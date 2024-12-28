@@ -264,7 +264,7 @@ function ChatbotPage() {
           <img
             src="/src/assets/web_logo.jpeg"
             alt="AI Companion Icon"
-            className="w-80 h-80 rounded-3xl object-cover mb-4"
+            className="w-80 h-80 rounded-3xl mt-16 object-cover mb-4"
           />
           <h1 className="text-2xl font-bold text-gray-800 text-center">
             AI Mental Health Companion
