@@ -161,41 +161,55 @@ function ChatbotPage() {
   // Text-to-Speech response of AI
   const textToSpeech = (text) => {
     if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "en-US";   // Set language
-      utterance.rate = 1;         // Adjust speaking rate
-      utterance.pitch = 1;
+      const maxChunkSize = 150;     // Adjust this to control chunk size or text to read
+      const utteranceQueue = [];
+
+      for (let i = 0; i < text.length; i += maxChunkSize) {
+        utteranceQueue.push(text.slice(i, i + maxChunkSize));
+      }
   
-      const setVoice = () => {
+      const speakChunks = () => {
+        if (utteranceQueue.length === 0) return;
+  
+        const utterance = new SpeechSynthesisUtterance(utteranceQueue.shift());
+        utterance.lang = "en-US";   // Set language
+        utterance.rate = 1;         // Adjust speaking rate
+        utterance.pitch = 1;
+  
         const voices = window.speechSynthesis.getVoices();
-  
-        const femaleVoice = voices.find((voice) =>
-          voice.lang.startsWith("en") &&
-          (voice.name.toLowerCase().includes("female") ||
-            voice.name.toLowerCase().includes("woman"))
+        const femaleVoice = voices.find(
+          (voice) =>
+            voice.lang.startsWith("en") &&
+            (voice.name.toLowerCase().includes("female") ||
+              voice.name.toLowerCase().includes("woman"))
         );
   
         if (femaleVoice) {
           utterance.voice = femaleVoice;
         } else {
           const fallbackVoice = voices.find((voice) => voice.lang.startsWith("en"));
-          if (fallbackVoice) {
-            utterance.voice = fallbackVoice;
-          }
+          if (fallbackVoice) utterance.voice = fallbackVoice;
         }
   
+        utterance.onend = speakChunks;
         window.speechSynthesis.speak(utterance);
-        window.speechSynthesis.onvoiceschanged = null;
       };
-      if (speechSynthesis.getVoices().length) {
-        setVoice();
-      } else {
-        window.speechSynthesis.onvoiceschanged = setVoice;
-      }
+  
+      const ensureVoicesAvailable = () => {
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+          speakChunks();
+        } else {
+          window.speechSynthesis.onvoiceschanged = ensureVoicesAvailable;
+        }
+      };
+  
+      ensureVoicesAvailable();
     } else {
       alert("Text-to-speech is not supported in this browser.");
     }
-  };  
+  };
+  
 
   // for voice recognition
   const startListening = () => {
