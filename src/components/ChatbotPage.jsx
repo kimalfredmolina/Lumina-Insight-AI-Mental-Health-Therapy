@@ -37,6 +37,7 @@ function ChatbotPage() {
   const mentalHealthKeywords = [
     "anxiety",
     "depression",
+    "depress",
     "stress",
     "mental health",
     "therapy",
@@ -48,7 +49,31 @@ function ChatbotPage() {
     "happy",
     "overwhelmed",
     "burnout",
-  ];
+    "hear",
+    "greatly",
+    "happy",
+    "talk",
+    "thanks",
+    "how are you",
+    "who are you",
+    "what is your purpose",
+    "compassion",
+    "support",
+    "understand",
+    "listen",
+    "care",
+    "help",
+    "comfort",
+    "kind",
+    "encourage",
+    "share",
+    "safe",
+    "connect",
+    "calm",
+    "relief",
+    "presence",
+    "empathetic"
+];
 
   useEffect(() => {
     chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -107,18 +132,18 @@ function ChatbotPage() {
   const handleResponse = async () => {
     if (!inputText.trim() || !chat) return;
 
-    // if (!isMentalHealthRelated(inputText)) {
-    //   setMessages((prevMessages) => [
-    //     ...prevMessages,
-    //     {
-    //       text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
-    //       sender: "ai",
-    //       timestamp: new Date(),
-    //     },
-    //   ]);
-    //   setInputText("");
-    //   return;
-    // }
+     if (!isMentalHealthRelated(inputText)) {
+       setMessages((prevMessages) => [
+    ...prevMessages,
+         {
+           text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
+           sender: "ai",
+           timestamp: new Date(),
+         },
+       ]);
+       setInputText("");
+    return;
+     }
 
     const newMessage = {
       text: inputText,
