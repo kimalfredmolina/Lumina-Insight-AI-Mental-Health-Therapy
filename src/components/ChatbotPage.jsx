@@ -6,9 +6,9 @@ import { IoMdHome } from "react-icons/io";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { motion } from "framer-motion"
 //ano tong import na to? nawawala yung mga design eh
 // import { send } from "vite";
-// import { text } from "framer-motion/client";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 // const genAI = new GoogleGenerativeAI(API_KEY);
@@ -250,7 +250,11 @@ function ChatbotPage() {
 
   return (
     <div className="h-screen w-screen p-4 flex justify-center items-center">
-      <div className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex">
+      <motion.div 
+      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: -100 }}
+      transition={{ duration: 1.5 }}
+      className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex">
         {/* Sidebar */}
         <div className="flex flex-col items-center w-1/3 p-4">
           <div className="w-full flex justify-start mb-4">
@@ -350,7 +354,7 @@ function ChatbotPage() {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
