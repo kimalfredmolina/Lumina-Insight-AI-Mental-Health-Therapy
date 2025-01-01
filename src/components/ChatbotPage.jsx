@@ -6,9 +6,9 @@ import { IoMdHome } from "react-icons/io";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { motion } from "framer-motion"
 //ano tong import na to? nawawala yung mga design eh
 // import { send } from "vite";
-// import { text } from "framer-motion/client";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 // const genAI = new GoogleGenerativeAI(API_KEY);
@@ -31,14 +31,13 @@ function ChatbotPage() {
   const [chat, setChat] = useState(null);
   const [error, setError] = useState(null);
   const chatContainerRef = useRef(null);
-
-  useEffect(() => {
-    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-  }, [messages]);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
 
   const mentalHealthKeywords = [
     "anxiety",
     "depression",
+    "depress",
     "stress",
     "mental health",
     "therapy",
@@ -50,8 +49,40 @@ function ChatbotPage() {
     "happy",
     "overwhelmed",
     "burnout",
-  ];
+    "hear",
+    "greatly",
+    "happy",
+    "talk",
+    "thanks",
+    "how are you",
+    "hello",
+    "good morning",
+    "good evening",
+    "good afternoon",
+    "who are you",
+    "what is your purpose",
+    "compassion",
+    "support",
+    "understand",
+    "listen",
+    "care",
+    "help",
+    "comfort",
+    "kind",
+    "encourage",
+    "share",
+    "safe",
+    "connect",
+    "calm",
+    "relief",
+    "presence",
+    "empathetic"
+];
 
+  useEffect(() => {
+    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+  }, [messages]);
+  //time date function
   useEffect(() => {
     const sessionId = Date.now().toString();
     localStorage.setItem("currentSessionId", sessionId);
@@ -62,7 +93,7 @@ function ChatbotPage() {
       localStorage.removeItem("currentSessionId");
     };
   }, []);
-
+  //Time date function
   useEffect(() => {
     const currentSessionId = localStorage.getItem("currentSessionId");
     if (currentSessionId) {
@@ -78,7 +109,8 @@ function ChatbotPage() {
     }
   }, [messages]);
 
-  const initializeChat = (async) => {
+  //Limitation for prompting
+  const initializeChat = async () => {
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
@@ -104,18 +136,18 @@ function ChatbotPage() {
   const handleResponse = async () => {
     if (!inputText.trim() || !chat) return;
 
-    // if (!isMentalHealthRelated(inputText)) {
-    //   setMessages((prevMessages) => [
-    //     ...prevMessages,
-    //     {
-    //       text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
-    //       sender: "ai",
-    //       timestamp: new Date(),
-    //     },
-    //   ]);
-    //   setInputText("");
-    //   return;
-    // }
+     if (!isMentalHealthRelated(inputText)) {
+       setMessages((prevMessages) => [
+    ...prevMessages,
+         {
+           text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
+           sender: "ai",
+           timestamp: new Date(),
+         },
+       ]);
+       setInputText("");
+    return;
+     }
 
     const newMessage = {
       text: inputText,
@@ -136,23 +168,16 @@ function ChatbotPage() {
       const result = await chat.sendMessage(inputText);
       const text = result.response.text();
 
-      // setMessages((prevMessages) => [
-      //   ...prevMessages,
-      //   {
-      //     text: text,
-      //     sender: "ai",
-      //     timestamp: new Date(),
-      //   },
-      // ]);
+      const aiMessage = {
+        text: text,
+        sender: "ai",
+        timestamp: new Date(),
+      };
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: text,
-          sender: "ai",
-          timestamp: new Date(),
-        },
-      ]);
+      setMessages((prev) => [...prev, aiMessage]);
+
+      // Trigger the text-to-speech
+      textToSpeech(aiMessage.text);
     } catch (err) {
       setError("Failed to process your message. Please try again.");
       await initializeChat();
@@ -162,9 +187,103 @@ function ChatbotPage() {
     }
   };
 
+  // Text-to-Speech response of AI
+  const textToSpeech = (text) => {
+    if ("speechSynthesis" in window) {
+      const maxChunkSize = 150;     // Adjust this to control chunk size or text to read
+      const utteranceQueue = [];
+
+      for (let i = 0; i < text.length; i += maxChunkSize) {
+        utteranceQueue.push(text.slice(i, i + maxChunkSize));
+      }
+  
+      const speakChunks = () => {
+        if (utteranceQueue.length === 0) return;
+  
+        const utterance = new SpeechSynthesisUtterance(utteranceQueue.shift());
+        utterance.lang = "en-US";   // Set language
+        utterance.rate = 1;         // Adjust speaking rate
+        utterance.pitch = 1;
+  
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(
+          (voice) =>
+            voice.lang.startsWith("en") &&
+            (voice.name.toLowerCase().includes("female") ||
+              voice.name.toLowerCase().includes("woman"))
+        );
+  
+        if (femaleVoice) {
+          utterance.voice = femaleVoice;
+        } else {
+          const fallbackVoice = voices.find((voice) => voice.lang.startsWith("en"));
+          if (fallbackVoice) utterance.voice = fallbackVoice;
+        }
+  
+        utterance.onend = speakChunks;
+        window.speechSynthesis.speak(utterance);
+      };
+  
+      const ensureVoicesAvailable = () => {
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+          speakChunks();
+        } else {
+          window.speechSynthesis.onvoiceschanged = ensureVoicesAvailable;
+        }
+      };
+  
+      ensureVoicesAvailable();
+    } else {
+      alert("Text-to-speech is not supported in this browser.");
+    }
+  };
+  
+
+  // for voice recognition
+  const startListening = () => {
+    if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US"; // Set language
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInputText(transcript);
+      setIsListening(false);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
+  };
+
   return (
     <div className="h-screen w-screen p-4 flex justify-center items-center">
-      <div className="max-w-7xl w-full h-full bg-gray-200 shadow-md rounded-lg p-4 flex">
+      <motion.div 
+      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: -100 }}
+      transition={{ duration: 1.5 }}
+      className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex">
         {/* Sidebar */}
         <div className="flex flex-col items-center w-1/3 p-4">
           <div className="w-full flex justify-start mb-4">
@@ -178,7 +297,7 @@ function ChatbotPage() {
           <img
             src="/src/assets/web_logo.jpeg"
             alt="AI Companion Icon"
-            className="w-80 h-80 rounded-3xl object-cover mb-4"
+            className="w-80 h-80 rounded-3xl mt-16 object-cover mb-4"
           />
           <h1 className="text-2xl font-bold text-gray-800 text-center">
             AI Mental Health Companion
@@ -231,8 +350,12 @@ function ChatbotPage() {
               <GoPaperclip className="h-5 w-5" />
             </button>
             <button
-              onClick={() => alert("Voice input feature coming soon!")}
-              className="p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 mr-2"
+              onClick={startListening}
+              className={`p-2 rounded-lg mr-2 ${
+                isListening
+                  ? "bg-green-400 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
               aria-label="Voice Input"
             >
               <GiSpeaker className="h-5 w-5" />
@@ -260,7 +383,7 @@ function ChatbotPage() {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
