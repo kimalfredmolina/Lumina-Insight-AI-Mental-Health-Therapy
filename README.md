@@ -4,6 +4,18 @@
 
 Discover a safe space where you can share your thoughts and feelings. Powered by advanced AI, our platform provides empathetic responses, helpful insights, and personalized support for your mental well-being. Whether you're seeking advice, clarity, or just someone to talk to, we're here for you 24/7.
 
+## Key Features
+  - Voice Recognition and Text-Voice Input: Seamlessly interact with Lumina AI using your voice. Share your thoughts and questions without needing to type, offering a more natural and effortless experience.
+
+  - AI-Integrated Voice Response: Lumina AI can read its responses aloud, providing a conversational and engaging interaction that feels more personal and supportive.
+
+  - 24/7 Availability: Access support at any time, day or night, ensuring you're never alone when you need someone to listen.
+
+  - Empathetic AI Responses: Designed to understand and respond with compassion, Lumina AI helps you feel heard and valued.
+
+  - Personalized Support: Tailored insights and advice to guide you on your journey to emotional well-being.
+
+**Your mental health matters, and we're here to help you navigate life's challenges with the power of advanced AI technology.**
 
 
 
