@@ -343,13 +343,6 @@ function ChatbotPage() {
           {/* Input Section */}
           <div className="flex items-center border rounded-lg p-2 bg-gray-50">
             <button
-              onClick={() => alert("File upload feature coming soon!")}
-              className="p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 mr-2"
-              aria-label="Upload File"
-            >
-              <GoPaperclip className="h-5 w-5" />
-            </button>
-            <button
               onClick={startListening}
               className={`p-2 rounded-lg mr-2 ${
                 isListening
