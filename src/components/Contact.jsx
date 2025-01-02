@@ -52,6 +52,13 @@ const Contact = () => {
             initial={{ opacity: 0, x: -100 }}
             transition={{ duration: 1 }}
             className="text-white mb-8 md:mb-0 md:w-1/2">
+            <div className="text-xl text-black font-semibold mb-4">
+                <p>We understand that reaching out can be difficult, but you don’t</p>
+                <p>have to face your challenges alone.</p>
+                <p>Our team is here to listen, guide, and</p>
+                <p>support you in your mental health journey.</p>
+                <p>Let’s take the first step together.</p>
+            </div>
           </motion.div>
           <motion.div
             whileInView={{ opacity: 1, x: 0 }}
