@@ -43,46 +43,172 @@ function ChatbotPage() {
     "therapy",
     "counseling",
     "well-being",
+    "wellness",
     "emotions",
-    "feeling",
+    "feelings",
     "sad",
+    "unhappy",
     "happy",
     "overwhelmed",
     "burnout",
+    "exhausted",
     "hear",
-    "greatly",
-    "happy",
+    "listening",
+    "understood",
+    "compassion",
+    "support",
+    "understand",
+    "empathy",
+    "sympathy",
+    "care",
+    "help",
+    "comfort",
+    "kindness",
+    "encourage",
+    "share",
+    "safe",
+    "safety",
+    "secure",
+    "connect",
+    "calm",
+    "relief",
+    "presence",
+    "empathetic",
+    "coping",
+    "healing",
+    "resilience",
+    "mindfulness",
+    "balance",
+    "self-care",
+    "psychology",
+    "psychiatry",
+    "mood",
+    "feel",
     "talk",
+    "conversation",
+    "vent",
     "thanks",
+    "grateful",
+    "gratitude",
     "how are you",
     "hello",
+    "hi",
     "good morning",
     "good evening",
     "good afternoon",
     "who are you",
     "what is your purpose",
-    "compassion",
-    "support",
-    "understand",
-    "listen",
-    "care",
-    "help",
-    "comfort",
-    "kind",
-    "encourage",
-    "share",
-    "safe",
-    "connect",
-    "calm",
-    "relief",
-    "presence",
-    "empathetic"
-];
+    "distress",
+    "trauma",
+    "PTSD",
+    "therapy session",
+    "mental wellness",
+    "life coach",
+    "coping strategies",
+    "mental health resources",
+    "emotional support",
+    "mental clarity",
+    "positive mindset",
+    "negative thoughts",
+    "self-worth",
+    "self-esteem",
+    "acceptance",
+    "hope",
+    "mental fitness",
+    "therapy goals",
+    "relaxation",
+    "stress relief",
+    "psychological support",
+    "caregiver",
+    "self-compassion",
+    "self-awareness",
+    "bipolar",
+    "schizophrenia",
+    "OCD",
+    "obsessive-compulsive disorder",
+    "ADHD",
+    "attention deficit",
+    "panic attacks",
+    "phobia",
+    "social anxiety",
+    "eating disorder",
+    "anorexia",
+    "bulimia",
+    "body dysmorphia",
+    "addiction",
+    "substance abuse",
+    "recovery",
+    "withdrawal",
+    "grief",
+    "mourning",
+    "loneliness",
+    "isolation",
+    // Therapy Types and Practices
+    "CBT",
+    "cognitive behavioral therapy",
+    "DBT",
+    "dialectical behavior therapy",
+    "psychotherapy",
+    "group therapy",
+    "peer support",
+    "meditation",
+    "yoga",
+    "art therapy",
+    "music therapy",
+    "journaling",
+    "exercise",
+    "breathing exercises",
+    // Feelings and Emotional States
+    "frustration",
+    "anger",
+    "irritability",
+    "helplessness",
+    "worthlessness",
+    "confidence",
+    "motivation",
+    "inner peace",
+    "self-doubt",
+    "self-criticism",
+    // Coping and Resilience
+    "problem-solving",
+    "self-regulation",
+    "emotional regulation",
+    "mindset shift",
+    "grounding techniques",
+    "self-expression",
+    "self-reflection",
+    "self-improvement",
+    "personal growth",
+    // Relationships and Interactions
+    "trust",
+    "boundaries",
+    "relationship health",
+    "family therapy",
+    "friendship",
+    "community",
+    // Additional Related Keywords
+    "mental strength",
+    "neurodivergence",
+    "neurotypical",
+    "neurodiversity",
+    "inner child",
+    "trauma-informed",
+    "postpartum",
+    "perinatal mental health",
+    "crisis intervention",
+    "hotline",
+    "suicide prevention",
+    "life balance",
+    "emotional intelligence",
+    "inner critic",
+    "hopefulness",
+    "restorative practices"
+  ];
 
   useEffect(() => {
     chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
   }, [messages]);
-  //time date function
+
   useEffect(() => {
     const sessionId = Date.now().toString();
     localStorage.setItem("currentSessionId", sessionId);
@@ -91,9 +217,10 @@ function ChatbotPage() {
 
     return () => {
       localStorage.removeItem("currentSessionId");
+      stopSpeechSynthesis(); // Stop speech synthesis when the component unmounts
     };
   }, []);
-  //Time date function
+
   useEffect(() => {
     const currentSessionId = localStorage.getItem("currentSessionId");
     if (currentSessionId) {
@@ -115,7 +242,7 @@ function ChatbotPage() {
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
       systemInstruction:
-        "You are Lumina, a compassionate and empathetic therapist specializing in mental health. Your role is to actively listen to the patient, validate their emotions, and provide thoughtful, supportive, and practical feedback. Speak in a warm, understanding tone that helps the patient feel safe, heard, and respected. Focus exclusively on mental health therapy—creating a nonjudgmental space for them to express themselves and offering helpful insights or strategies tailored to their emotional well-being. If asked about topics unrelated to improving mental health (e.g., technical questions like 'What is React JS?'), gently redirect the conversation by stating, 'I’m here to support your mental health. Let’s focus on what’s on your mind emotionally or mentally.' Always prioritize fostering a safe and therapeutic environment.",
+        "You are Lumina, a compassionate and empathetic therapist specializing in mental health. Your role is to actively listen to the patient, validate their emotions, and provide thoughtful, supportive, and practical feedback. Speak in a warm, understanding tone that helps the patient feel safe, heard, and respected. Focus exclusively on mental health therapy—creating a nonjudgmental space for them to express themselves and offering helpful insights or strategies tailored to their emotional well-being. If asked about topics unrelated to mental health (e.g., technical questions like 'What is React JS?'), gently redirect the conversation by stating, 'I’m here to support your mental health. Let’s focus on what’s on your mind emotionally or mentally.' Always prioritize fostering a safe and therapeutic environment.",
     });
 
     const newChat = model.startChat({
@@ -127,6 +254,12 @@ function ChatbotPage() {
     setChat(newChat);
   };
 
+  const stopSpeechSynthesis = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel(); // Stop the ongoing speech
+    }
+  };
+
   const isMentalHealthRelated = (text) => {
     return mentalHealthKeywords.some((keyword) =>
       text.toLowerCase().includes(keyword)
@@ -136,18 +269,18 @@ function ChatbotPage() {
   const handleResponse = async () => {
     if (!inputText.trim() || !chat) return;
 
-     if (!isMentalHealthRelated(inputText)) {
-       setMessages((prevMessages) => [
-    ...prevMessages,
-         {
-           text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
-           sender: "ai",
-           timestamp: new Date(),
-         },
-       ]);
-       setInputText("");
-    return;
-     }
+    if (!isMentalHealthRelated(inputText)) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
+          sender: "ai",
+          timestamp: new Date(),
+        },
+      ]);
+      setInputText("");
+      return;
+    }
 
     const newMessage = {
       text: inputText,
@@ -166,10 +299,13 @@ function ChatbotPage() {
 
     try {
       const result = await chat.sendMessage(inputText);
-      const text = result.response.text();
+      const rawText = await result.response.text();
+
+      // Convert Markdown-like **bold** to HTML <strong>
+      const formattedText = rawText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
       const aiMessage = {
-        text: text,
+        text: formattedText,
         sender: "ai",
         timestamp: new Date(),
       };
@@ -177,7 +313,7 @@ function ChatbotPage() {
       setMessages((prev) => [...prev, aiMessage]);
 
       // Trigger the text-to-speech
-      textToSpeech(aiMessage.text);
+      textToSpeech(rawText); // Use the raw text for speech synthesis
     } catch (err) {
       setError("Failed to process your message. Please try again.");
       await initializeChat();
@@ -196,15 +332,15 @@ function ChatbotPage() {
       for (let i = 0; i < text.length; i += maxChunkSize) {
         utteranceQueue.push(text.slice(i, i + maxChunkSize));
       }
-  
+
       const speakChunks = () => {
         if (utteranceQueue.length === 0) return;
-  
+
         const utterance = new SpeechSynthesisUtterance(utteranceQueue.shift());
         utterance.lang = "en-US";   // Set language
         utterance.rate = 1;         // Adjust speaking rate
         utterance.pitch = 1;
-  
+
         const voices = window.speechSynthesis.getVoices();
         const femaleVoice = voices.find(
           (voice) =>
@@ -212,18 +348,18 @@ function ChatbotPage() {
             (voice.name.toLowerCase().includes("female") ||
               voice.name.toLowerCase().includes("woman"))
         );
-  
+
         if (femaleVoice) {
           utterance.voice = femaleVoice;
         } else {
           const fallbackVoice = voices.find((voice) => voice.lang.startsWith("en"));
           if (fallbackVoice) utterance.voice = fallbackVoice;
         }
-  
+
         utterance.onend = speakChunks;
         window.speechSynthesis.speak(utterance);
       };
-  
+
       const ensureVoicesAvailable = () => {
         const voices = window.speechSynthesis.getVoices();
         if (voices.length > 0) {
@@ -232,7 +368,7 @@ function ChatbotPage() {
           window.speechSynthesis.onvoiceschanged = ensureVoicesAvailable;
         }
       };
-  
+
       ensureVoicesAvailable();
     } else {
       alert("Text-to-speech is not supported in this browser.");
@@ -277,13 +413,24 @@ function ChatbotPage() {
     recognition.start();
   };
 
+  // Stop speech synthesis when the page is refreshed or navigated away
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      stopSpeechSynthesis();
+    };
+
+    return () => {
+      window.onbeforeunload = null; // Cleanup when component unmounts
+    };
+  }, []);
+
   return (
     <div className="h-screen w-screen p-4 flex justify-center items-center">
-      <motion.div 
-      whileInView={{ opacity: 1, y: 0 }}
-      initial={{ opacity: 0, y: -100 }}
-      transition={{ duration: 1.5 }}
-      className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex">
+      <motion.div
+        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: -100 }}
+        transition={{ duration: 1.5 }}
+        className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex">
         {/* Sidebar */}
         <div className="flex flex-col items-center w-1/3 p-4">
           <div className="w-full flex justify-start mb-4">
@@ -318,20 +465,22 @@ function ChatbotPage() {
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`message ${
-                  message.sender === "user" ? "user" : "ai"
-                }`}
+                className={`message ${message.sender === "user" ? "user" : "ai"}`}
               >
                 <div
-                  className={`p-4 rounded-lg mb-4 ${
-                    message.sender === "user"
-                      ? "bg-blue-200 text-right"
-                      : "bg-green-200 text-left"
-                  }`}
+                  className={`p-4 rounded-lg mb-4 ${message.sender === "user" ? "bg-blue-200 text-right" : "bg-green-200 text-left"
+                    }`}
                 >
-                  <p className="message-text">{message.text}</p>
+                  {message.sender === "ai" ? (
+                    <p
+                      className="message-text"
+                      dangerouslySetInnerHTML={{ __html: message.text }}
+                    />
+                  ) : (
+                    <p className="message-text">{message.text}</p>
+                  )}
                   <span className="text-xs text-gray-500">
-                    {dayjs(message.timestamp).format("MM.DD.YYYY HH:mm:ss")}
+                    {dayjs(message.timestamp).format("MM.DD.YYYY h:mm A")}
                   </span>
                 </div>
               </div>
@@ -344,11 +493,10 @@ function ChatbotPage() {
           <div className="flex items-center border rounded-lg p-2 bg-gray-50">
             <button
               onClick={startListening}
-              className={`p-2 rounded-lg mr-2 ${
-                isListening
-                  ? "bg-green-400 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+              className={`p-2 rounded-lg mr-2 ${isListening
+                ? "bg-green-400 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
               aria-label="Voice Input"
             >
               <GiSpeaker className="h-5 w-5" />
