@@ -143,7 +143,6 @@ function ChatbotPage() {
     "mourning",
     "loneliness",
     "isolation",
-    // Therapy Types and Practices
     "CBT",
     "cognitive behavioral therapy",
     "DBT",
@@ -158,7 +157,6 @@ function ChatbotPage() {
     "journaling",
     "exercise",
     "breathing exercises",
-    // Feelings and Emotional States
     "frustration",
     "anger",
     "irritability",
@@ -169,7 +167,6 @@ function ChatbotPage() {
     "inner peace",
     "self-doubt",
     "self-criticism",
-    // Coping and Resilience
     "problem-solving",
     "self-regulation",
     "emotional regulation",
@@ -179,14 +176,12 @@ function ChatbotPage() {
     "self-reflection",
     "self-improvement",
     "personal growth",
-    // Relationships and Interactions
     "trust",
     "boundaries",
     "relationship health",
     "family therapy",
     "friendship",
     "community",
-    // Additional Related Keywords
     "mental strength",
     "neurodivergence",
     "neurotypical",
@@ -301,7 +296,6 @@ function ChatbotPage() {
       const result = await chat.sendMessage(inputText);
       const rawText = await result.response.text();
 
-      // Convert Markdown-like **bold** to HTML <strong>
       const formattedText = rawText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
       const aiMessage = {
