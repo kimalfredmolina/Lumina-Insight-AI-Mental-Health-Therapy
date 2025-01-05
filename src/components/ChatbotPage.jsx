@@ -6,7 +6,7 @@ import { IoMdHome } from "react-icons/io";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 //ano tong import na to? nawawala yung mga design eh
 // import { send } from "vite";
 
@@ -197,7 +197,7 @@ function ChatbotPage() {
     "emotional intelligence",
     "inner critic",
     "hopefulness",
-    "restorative practices"
+    "restorative practices",
   ];
 
   useEffect(() => {
@@ -237,7 +237,7 @@ function ChatbotPage() {
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
       systemInstruction:
-        "You are Lumina, a compassionate and empathetic therapist specializing in mental health. Your role is to actively listen to the patient, validate their emotions, and provide thoughtful, supportive, and practical feedback. Speak in a warm, understanding tone that helps the patient feel safe, heard, and respected. Focus exclusively on mental health therapy—creating a nonjudgmental space for them to express themselves and offering helpful insights or strategies tailored to their emotional well-being. If asked about topics unrelated to mental health (e.g., technical questions like 'What is React JS?'), gently redirect the conversation by stating, 'I’m here to support your mental health. Let’s focus on what’s on your mind emotionally or mentally.' Always prioritize fostering a safe and therapeutic environment.",
+        "You are Lumina, a compassionate and empathetic therapist who specializes in mental health. Your role is to be a warm, understanding presence—someone the person can talk to freely, like a close, caring friend who really gets them. Your focus is on actively listening, validating their feelings, and offering thoughtful, supportive feedback that feels natural and relatable. Keep your tone casual, warm, and down-to-earth, creating a space where they feel safe, understood, and respected without it feeling clinical or distant. Speak in a way that flows like a normal conversation, sprinkling in little things like 'I hear you,' or 'That makes sense,' to show you're engaged and present.If the conversation veers into unrelated topics, gently steer it back by saying something like, 'I totally get why that’s interesting, but I’m here to support you emotionally. Let’s focus on how you’re feeling—what’s on your mind?' The goal is to make them feel deeply heard and supported, as if they’re talking to someone who really cares about them and their well-being.",
     });
 
     const newChat = model.startChat({
@@ -296,7 +296,10 @@ function ChatbotPage() {
       const result = await chat.sendMessage(inputText);
       const rawText = await result.response.text();
 
-      const formattedText = rawText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      const formattedText = rawText.replace(
+        /\*\*(.*?)\*\*/g,
+        "<strong>$1</strong>"
+      );
 
       const aiMessage = {
         text: formattedText,
@@ -320,7 +323,7 @@ function ChatbotPage() {
   // Text-to-Speech response of AI
   const textToSpeech = (text) => {
     if ("speechSynthesis" in window) {
-      const maxChunkSize = 150;     // Adjust this to control chunk size or text to read
+      const maxChunkSize = 150; // Adjust this to control chunk size or text to read
       const utteranceQueue = [];
 
       for (let i = 0; i < text.length; i += maxChunkSize) {
@@ -331,8 +334,8 @@ function ChatbotPage() {
         if (utteranceQueue.length === 0) return;
 
         const utterance = new SpeechSynthesisUtterance(utteranceQueue.shift());
-        utterance.lang = "en-US";   // Set language
-        utterance.rate = 1;         // Adjust speaking rate
+        utterance.lang = "en-US"; // Set language
+        utterance.rate = 1; // Adjust speaking rate
         utterance.pitch = 1;
 
         const voices = window.speechSynthesis.getVoices();
@@ -346,7 +349,9 @@ function ChatbotPage() {
         if (femaleVoice) {
           utterance.voice = femaleVoice;
         } else {
-          const fallbackVoice = voices.find((voice) => voice.lang.startsWith("en"));
+          const fallbackVoice = voices.find((voice) =>
+            voice.lang.startsWith("en")
+          );
           if (fallbackVoice) utterance.voice = fallbackVoice;
         }
 
@@ -368,11 +373,12 @@ function ChatbotPage() {
       alert("Text-to-speech is not supported in this browser.");
     }
   };
-  
 
   // for voice recognition
   const startListening = () => {
-    if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+    if (
+      !("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
+    ) {
       alert("Speech recognition is not supported in this browser.");
       return;
     }
@@ -424,7 +430,8 @@ function ChatbotPage() {
         whileInView={{ opacity: 1, y: 0 }}
         initial={{ opacity: 0, y: -100 }}
         transition={{ duration: 1.5 }}
-        className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex">
+        className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex"
+      >
         {/* Sidebar */}
         <div className="flex flex-col items-center w-1/3 p-4">
           <div className="w-full flex justify-start mb-4">
@@ -459,11 +466,16 @@ function ChatbotPage() {
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`message ${message.sender === "user" ? "user" : "ai"}`}
+                className={`message ${
+                  message.sender === "user" ? "user" : "ai"
+                }`}
               >
                 <div
-                  className={`p-4 rounded-lg mb-4 ${message.sender === "user" ? "bg-blue-200 text-right" : "bg-green-200 text-left"
-                    }`}
+                  className={`p-4 rounded-lg mb-4 ${
+                    message.sender === "user"
+                      ? "bg-blue-200 text-right"
+                      : "bg-green-200 text-left"
+                  }`}
                 >
                   {message.sender === "ai" ? (
                     <p
@@ -487,10 +499,11 @@ function ChatbotPage() {
           <div className="flex items-center border rounded-lg p-2 bg-gray-50">
             <button
               onClick={startListening}
-              className={`p-2 rounded-lg mr-2 ${isListening
-                ? "bg-green-400 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+              className={`p-2 rounded-lg mr-2 ${
+                isListening
+                  ? "bg-green-400 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
               aria-label="Voice Input"
             >
               <GiSpeaker className="h-5 w-5" />
