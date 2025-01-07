@@ -36,172 +36,6 @@ function ChatbotPage() {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
-  // const mentalHealthKeywords = [
-  //   "anxiety",
-  //   "depression",
-  //   "depress",
-  //   "stress",
-  //   "mental health",
-  //   "therapy",
-  //   "counseling",
-  //   "well-being",
-  //   "wellness",
-  //   "emotions",
-  //   "feelings",
-  //   "sad",
-  //   "unhappy",
-  //   "happy",
-  //   "overwhelmed",
-  //   "burnout",
-  //   "exhausted",
-  //   "hear",
-  //   "listening",
-  //   "understood",
-  //   "compassion",
-  //   "support",
-  //   "understand",
-  //   "empathy",
-  //   "sympathy",
-  //   "care",
-  //   "help",
-  //   "comfort",
-  //   "kindness",
-  //   "encourage",
-  //   "share",
-  //   "safe",
-  //   "safety",
-  //   "secure",
-  //   "connect",
-  //   "calm",
-  //   "relief",
-  //   "presence",
-  //   "empathetic",
-  //   "coping",
-  //   "healing",
-  //   "resilience",
-  //   "mindfulness",
-  //   "balance",
-  //   "self-care",
-  //   "psychology",
-  //   "psychiatry",
-  //   "mood",
-  //   "feel",
-  //   "talk",
-  //   "conversation",
-  //   "vent",
-  //   "thanks",
-  //   "grateful",
-  //   "gratitude",
-  //   "how are you",
-  //   "hello",
-  //   "hi",
-  //   "good morning",
-  //   "good evening",
-  //   "good afternoon",
-  //   "who are you",
-  //   "what is your purpose",
-  //   "distress",
-  //   "trauma",
-  //   "PTSD",
-  //   "therapy session",
-  //   "mental wellness",
-  //   "life coach",
-  //   "coping strategies",
-  //   "mental health resources",
-  //   "emotional support",
-  //   "mental clarity",
-  //   "positive mindset",
-  //   "negative thoughts",
-  //   "self-worth",
-  //   "self-esteem",
-  //   "acceptance",
-  //   "hope",
-  //   "mental fitness",
-  //   "therapy goals",
-  //   "relaxation",
-  //   "stress relief",
-  //   "psychological support",
-  //   "caregiver",
-  //   "self-compassion",
-  //   "self-awareness",
-  //   "bipolar",
-  //   "schizophrenia",
-  //   "OCD",
-  //   "obsessive-compulsive disorder",
-  //   "ADHD",
-  //   "attention deficit",
-  //   "panic attacks",
-  //   "phobia",
-  //   "social anxiety",
-  //   "eating disorder",
-  //   "anorexia",
-  //   "bulimia",
-  //   "body dysmorphia",
-  //   "addiction",
-  //   "substance abuse",
-  //   "recovery",
-  //   "withdrawal",
-  //   "grief",
-  //   "mourning",
-  //   "loneliness",
-  //   "isolation",
-  //   "CBT",
-  //   "cognitive behavioral therapy",
-  //   "DBT",
-  //   "dialectical behavior therapy",
-  //   "psychotherapy",
-  //   "group therapy",
-  //   "peer support",
-  //   "meditation",
-  //   "yoga",
-  //   "art therapy",
-  //   "music therapy",
-  //   "journaling",
-  //   "exercise",
-  //   "breathing exercises",
-  //   "frustration",
-  //   "anger",
-  //   "irritability",
-  //   "helplessness",
-  //   "worthlessness",
-  //   "confidence",
-  //   "motivation",
-  //   "inner peace",
-  //   "self-doubt",
-  //   "self-criticism",
-  //   "problem-solving",
-  //   "self-regulation",
-  //   "emotional regulation",
-  //   "mindset shift",
-  //   "grounding techniques",
-  //   "self-expression",
-  //   "self-reflection",
-  //   "self-improvement",
-  //   "personal growth",
-  //   "trust",
-  //   "boundaries",
-  //   "relationship health",
-  //   "family therapy",
-  //   "friendship",
-  //   "community",
-  //   "mental strength",
-  //   "neurodivergence",
-  //   "neurotypical",
-  //   "neurodiversity",
-  //   "inner child",
-  //   "trauma-informed",
-  //   "postpartum",
-  //   "perinatal mental health",
-  //   "crisis intervention",
-  //   "hotline",
-  //   "suicide prevention",
-  //   "life balance",
-  //   "emotional intelligence",
-  //   "inner critic",
-  //   "hopefulness",
-  //   "restorative practices",
-  // ];
-
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -289,17 +123,14 @@ function ChatbotPage() {
     setError(null);
 
     try {
-      // Send the user's message to the chat model
       const result = await chat.sendMessage(inputText);
-      const rawText = await result.response.text(); // Get the raw text response
+      const rawText = await result.response.text(); 
 
-      // Format the response text (e.g., replace markdown with HTML)
       const formattedText = rawText.replace(
         /\*\*(.*?)\*\*/g,
         "<strong>$1</strong>"
       );
 
-      // Create the AI's message object
       const aiMessage = {
         text: formattedText,
         sender: "ai",
@@ -308,16 +139,12 @@ function ChatbotPage() {
 
       // Add the AI's response to the chat history
       setMessages((prev) => [...prev, aiMessage]);
-
-      // Trigger text-to-speech for the AI's response
       textToSpeech(rawText);
     } catch (err) {
-      // Set error state and attempt to reinitialize the chat
       setError("Failed to process your message. Please try again.");
       console.error("Error while processing message:", err);
-      await initializeChat(); // Reinitialize chat on failure
+      await initializeChat(); 
     } finally {
-      // Reset loading state and clear the input text
       setLoading(false);
       setInputText("");
     }
