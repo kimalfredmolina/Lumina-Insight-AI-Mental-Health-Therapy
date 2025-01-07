@@ -109,8 +109,8 @@ const Description = () => {
       >
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
-            <HelpCircle className="w-8 h-8 text-purple-500 mr-2" />
-            <h2 className="text-3xl font-bold text-gray-800">Frequently Asked Questions</h2>
+            <HelpCircle className="w-8 h-8 mt-32 text-purple-500 mr-2" />
+            <h2 className="text-3xl font-bold mt-32 text-gray-800">Frequently Asked Questions</h2>
           </div>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Find answers to common questions about our AI Mental Health Assistant and how it can support your well-being journey.
