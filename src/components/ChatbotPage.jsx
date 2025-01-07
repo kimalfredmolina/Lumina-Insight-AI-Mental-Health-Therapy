@@ -282,10 +282,10 @@ function ChatbotPage() {
             className="w-80 h-80 rounded-3xl mt-16 object-cover mb-4"
           />
           <h1 className="text-2xl font-bold text-gray-800 text-center">
-            AI Mental Health Companion
+            Lumina AI Therapy
           </h1>
           <p className="text-gray-600 text-center mt-2">
-            Talk with your AI counselor <br /> and find clarity and support.
+            Talk with your AI Therapy <br /> and find clarity and support.
           </p>
         </div>
 
