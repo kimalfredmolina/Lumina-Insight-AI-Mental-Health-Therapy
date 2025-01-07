@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import bg1 from '../assets/bg1.gif';
 import bg2 from '../assets/bg2.gif';
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, Phone } from 'lucide-react';
 
 const Description = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -174,6 +174,22 @@ const Description = () => {
               </AnimatePresence>
             </motion.div>
           ))}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: faqs.length * 0.1 }}
+            className="flex justify-center mt-8"
+          >
+            <a
+              href="https://blog.opencounseling.com/hotlines-ph/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            >
+              <Phone className="w-6 h-6 group-hover:animate-pulse" />
+              <span className="text-lg font-semibold">Access Emergency Mental Health Resources</span>
+            </a>
+          </motion.div>
         </div>
       </motion.div>
     </div>
