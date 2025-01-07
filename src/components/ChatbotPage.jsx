@@ -31,6 +31,8 @@ function ChatbotPage() {
   const [chat, setChat] = useState(null);
   const [error, setError] = useState(null);
   const chatContainerRef = useRef(null);
+  const [nameSubmitted, setNameSubmitted] = useState(false);
+  const [userName, setUserName] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
@@ -201,7 +203,10 @@ function ChatbotPage() {
   // ];
 
   useEffect(() => {
-    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -231,6 +236,21 @@ function ChatbotPage() {
     }
   }, [messages]);
 
+  const handleNameSubmit = () => {
+    if (userName.trim()) {
+      setMessages([
+        {
+          text: `Hi ${userName}, nice to meet you! Tell me about what's on your mind.`,
+          sender: "ai",
+          timestamp: new Date(),
+        },
+      ]);
+      setNameSubmitted(true);
+    } else {
+      alert("Please enter your name!");
+    }
+  };
+
   //Limitation for prompting
   const initializeChat = async () => {
     const genAI = new GoogleGenerativeAI(API_KEY);
@@ -255,27 +275,8 @@ function ChatbotPage() {
     }
   };
 
-  const isMentalHealthRelated = (text) => {
-    return mentalHealthKeywords.some((keyword) =>
-      text.toLowerCase().includes(keyword)
-    );
-  };
-
   const handleResponse = async () => {
-    if (!inputText.trim() || !chat) return;
-
-    // if (!isMentalHealthRelated(inputText)) {
-    //   setMessages((prevMessages) => [
-    //     ...prevMessages,
-    //     {
-    //       text: "It seems your question is not related to mental health. Let's focus on your feelings or concerns.",
-    //       sender: "ai",
-    //       timestamp: new Date(),
-    //     },
-    //   ]);
-    //   setInputText("");
-    //   return;
-    // }
+    if (!inputText.trim()) return;
 
     const newMessage = {
       text: inputText,
@@ -283,38 +284,40 @@ function ChatbotPage() {
       timestamp: new Date(),
     };
 
-    // setMessages((prevMessages) => [
-    //   ...prevMessages,
-    //   { text: inputText, sender: "user", timestamp: new Date() },
-    // ]);
-
     setMessages((prev) => [...prev, newMessage]);
     setLoading(true);
     setError(null);
 
     try {
+      // Send the user's message to the chat model
       const result = await chat.sendMessage(inputText);
-      const rawText = await result.response.text();
+      const rawText = await result.response.text(); // Get the raw text response
 
+      // Format the response text (e.g., replace markdown with HTML)
       const formattedText = rawText.replace(
         /\*\*(.*?)\*\*/g,
         "<strong>$1</strong>"
       );
 
+      // Create the AI's message object
       const aiMessage = {
         text: formattedText,
         sender: "ai",
         timestamp: new Date(),
       };
 
+      // Add the AI's response to the chat history
       setMessages((prev) => [...prev, aiMessage]);
 
-      // Trigger the text-to-speech
-      textToSpeech(rawText); // Use the raw text for speech synthesis
+      // Trigger text-to-speech for the AI's response
+      textToSpeech(rawText);
     } catch (err) {
+      // Set error state and attempt to reinitialize the chat
       setError("Failed to process your message. Please try again.");
-      await initializeChat();
+      console.error("Error while processing message:", err);
+      await initializeChat(); // Reinitialize chat on failure
     } finally {
+      // Reset loading state and clear the input text
       setLoading(false);
       setInputText("");
     }
@@ -432,105 +435,130 @@ function ChatbotPage() {
         transition={{ duration: 1.5 }}
         className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex"
       >
-        {/* Sidebar */}
-        <div className="flex flex-col items-center w-1/3 p-4">
-          <div className="w-full flex justify-start mb-4">
-            <Link
-              to="/"
-              className="p-2 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400"
-            >
-              <IoMdHome className="h-6 w-6" />
-            </Link>
-          </div>
-          <img
-            src="/src/assets/web_logo.jpeg"
-            alt="AI Companion Icon"
-            className="w-80 h-80 rounded-3xl mt-16 object-cover mb-4"
-          />
-          <h1 className="text-2xl font-bold text-gray-800 text-center">
-            AI Mental Health Companion
-          </h1>
-          <p className="text-gray-600 text-center mt-2">
-            Talk with your AI counselor <br /> and find clarity and support.
-          </p>
-        </div>
-
-        {/* Main Section */}
-        <div className="flex flex-col w-full h-full">
-          {/* Chat Container */}
-          <div
-            className="flex-grow overflow-auto chat-container p-2 border rounded-lg bg-gray-50"
-            ref={chatContainerRef}
-            style={{ maxHeight: "100%", marginBottom: "10px" }}
-          >
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`message ${
-                  message.sender === "user" ? "user" : "ai"
-                }`}
-              >
-                <div
-                  className={`p-4 rounded-lg mb-4 ${
-                    message.sender === "user"
-                      ? "bg-blue-200 text-right"
-                      : "bg-green-200 text-left"
-                  }`}
-                >
-                  {message.sender === "ai" ? (
-                    <p
-                      className="message-text"
-                      dangerouslySetInnerHTML={{ __html: message.text }}
-                    />
-                  ) : (
-                    <p className="message-text">{message.text}</p>
-                  )}
-                  <span className="text-xs text-gray-500">
-                    {dayjs(message.timestamp).format("MM.DD.YYYY h:mm A")}
-                  </span>
-                </div>
-              </div>
-            ))}
-            {loading && <p className="text-center text-gray-600">Loading...</p>}
-            {error && <p className="text-center text-red-600">{error}</p>}
-          </div>
-
-          {/* Input Section */}
-          <div className="flex items-center border rounded-lg p-2 bg-gray-50">
-            <button
-              onClick={startListening}
-              className={`p-2 rounded-lg mr-2 ${
-                isListening
-                  ? "bg-green-400 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-              aria-label="Voice Input"
-            >
-              <GiSpeaker className="h-5 w-5" />
-            </button>
-
-            <textarea
-              placeholder="Share your thoughts or concerns..."
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleResponse();
-                }
-              }}
-              className="flex-grow p-2 border-none resize-none h-12 bg-transparent focus:outline-none"
+        {!nameSubmitted ? (
+          <div className="flex flex-col items-center justify-center h-full">
+            <h2 className="text-xl font-semibold mb-4">
+              Before we begin, what's your name?
+            </h2>
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              className="p-2 border border-gray-300 rounded-lg mb-4"
             />
-
             <button
-              onClick={handleResponse}
-              className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              aria-label="Send Message"
+              onClick={handleNameSubmit}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
             >
-              <FaArrowCircleUp className="h-6 w-6" />
+              Start Conversation
             </button>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Sidebar */}
+            <div className="flex flex-col items-center w-1/3 p-4">
+              <div className="w-full flex justify-start mb-4">
+                <Link
+                  to="/"
+                  className="p-2 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400"
+                >
+                  <IoMdHome className="h-6 w-6" />
+                </Link>
+              </div>
+              <img
+                src="/src/assets/web_logo.jpeg"
+                alt="AI Companion Icon"
+                className="w-80 h-80 rounded-3xl mt-16 object-cover mb-4"
+              />
+              <h1 className="text-2xl font-bold text-gray-800 text-center">
+                Lumina AI Therapy
+              </h1>
+              <p className="text-gray-600 text-center mt-2">
+                Talk with your AI Therapy <br /> and find clarity and support.
+              </p>
+            </div>
+
+            {/* Main Section */}
+            <div className="flex flex-col w-full h-full">
+              {/* Chat Container */}
+              <div
+                className="flex-grow overflow-auto chat-container p-2 border rounded-lg bg-gray-50"
+                ref={chatContainerRef}
+                style={{ maxHeight: "100%", marginBottom: "10px" }}
+              >
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`message ${
+                      message.sender === "user" ? "user" : "ai"
+                    }`}
+                  >
+                    <div
+                      className={`p-4 rounded-lg mb-4 ${
+                        message.sender === "user"
+                          ? "bg-blue-200 text-right"
+                          : "bg-green-200 text-left"
+                      }`}
+                    >
+                      {message.sender === "ai" ? (
+                        <p
+                          className="message-text"
+                          dangerouslySetInnerHTML={{ __html: message.text }}
+                        />
+                      ) : (
+                        <p className="message-text">{message.text}</p>
+                      )}
+                      <span className="text-xs text-gray-500">
+                        {dayjs(message.timestamp).format("MM.DD.YYYY h:mm A")}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {loading && (
+                  <p className="text-center text-gray-600">Loading...</p>
+                )}
+                {error && <p className="text-center text-red-600">{error}</p>}
+              </div>
+
+              {/* Input Section */}
+              <div className="flex items-center border rounded-lg p-2 bg-gray-50">
+                <button
+                  onClick={startListening}
+                  className={`p-2 rounded-lg mr-2 ${
+                    isListening
+                      ? "bg-green-400 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                  aria-label="Voice Input"
+                >
+                  <GiSpeaker className="h-5 w-5" />
+                </button>
+
+                <textarea
+                  placeholder="Share your thoughts or concerns..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleResponse();
+                    }
+                  }}
+                  className="flex-grow p-2 border-none resize-none h-12 bg-transparent focus:outline-none"
+                />
+
+                <button
+                  onClick={handleResponse}
+                  className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  aria-label="Send Message"
+                >
+                  <FaArrowCircleUp className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </motion.div>
     </div>
   );
