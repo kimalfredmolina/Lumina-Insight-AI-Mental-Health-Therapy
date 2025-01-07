@@ -24,6 +24,110 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 //   },
 // });
 
+const allChatSuggestions = [
+  {
+    title: "Dealing with Anxiety",
+    prompt: "I've been feeling anxious lately and would like to talk about it.",
+    icon: "😟"
+  },
+  {
+    title: "Managing Depression",
+    prompt: "I've been feeling down and want to discuss ways to cope.",
+    icon: "😔"
+  },
+  {
+    title: "Work Stress",
+    prompt: "I'm struggling with work-related stress.",
+    icon: "💼"
+  },
+  {
+    title: "Relationship Issues",
+    prompt: "I need advice about my relationships.",
+    icon: "❤️"
+  },
+  {
+    title: "Sleep Problems",
+    prompt: "I'm having trouble sleeping and it's affecting my mental health.",
+    icon: "😴"
+  },
+  {
+    title: "Self-Esteem",
+    prompt: "I want to work on building my self-confidence.",
+    icon: "✨"
+  },
+  {
+    title: "Burnout",
+    prompt: "I'm feeling overwhelmed and exhausted with everything.",
+    icon: "🔥"
+  },
+  {
+    title: "Social Anxiety",
+    prompt: "I feel nervous in social situations.",
+    icon: "🤝"
+  },
+  {
+    title: "Life Changes",
+    prompt: "I'm going through major life changes and need support.",
+    icon: "🌱"
+  },
+  {
+    title: "Motivation Issues",
+    prompt: "I'm struggling to find motivation lately.",
+    icon: "🎯"
+  },
+  {
+    title: "Grief and Loss",
+    prompt: "I'm dealing with the loss of a loved one and need support.",
+    icon: "🕊️"
+  },
+  {
+    title: "Loneliness",
+    prompt: "I feel lonely and want to discuss how to cope with it.",
+    icon: "🌌"
+  },
+  {
+    title: "Body Image Concerns",
+    prompt: "I'm struggling with my body image and self-acceptance.",
+    icon: "🪞"
+  },
+  {
+    title: "Parenting Stress",
+    prompt: "I'm finding it challenging to balance parenting and self-care.",
+    icon: "👶"
+  },
+  {
+    title: "Trauma Recovery",
+    prompt: "I'm working through past trauma and need guidance.",
+    icon: "🛡️"
+  },
+  {
+    title: "Anger Management",
+    prompt: "I'm having trouble controlling my anger and want advice.",
+    icon: "😡"
+  },
+  {
+    title: "Financial Stress",
+    prompt: "I'm stressed about my financial situation and need support.",
+    icon: "💰"
+  },
+  {
+    title: "Identity Struggles",
+    prompt: "I'm exploring my identity and would like to talk about it.",
+    icon: "🌈"
+  },
+  {
+    title: "Chronic Illness Support",
+    prompt: "I'm living with a chronic illness and need emotional support.",
+    icon: "💊"
+  },
+  {
+    title: "Perfectionism",
+    prompt: "I struggle with perfectionism and want to find balance.",
+    icon: "🎨"
+  }
+];
+
+
 function ChatbotPage() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
@@ -35,6 +139,21 @@ function ChatbotPage() {
   const [userName, setUserName] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
+  const [currentSuggestions, setCurrentSuggestions] = useState([]);
+  const [, setShowSuggestions] = useState(true);
+  const [isClickProcessing, setIsClickProcessing] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] = useState(null);
+
+
+  const getRandomSuggestions = (count = 4) => {
+    const shuffled = [...allChatSuggestions].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
+  useEffect(() => {
+    setCurrentSuggestions(getRandomSuggestions());
+  }, []);
+
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -68,6 +187,19 @@ function ChatbotPage() {
         chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const handleSuggestionClick = (prompt) => {
+    // If this suggestion is already selected and in the input box, send it
+    if (selectedSuggestion === prompt && inputText === prompt) {
+      handleResponse();
+      setSelectedSuggestion(null); // Reset selection after sending
+    } else {
+      // First click - just put it in the input box
+      setShowSuggestions(false);
+      setInputText(prompt);
+      setSelectedSuggestion(prompt);
+    }
+  };
 
   const handleNameSubmit = () => {
     if (userName.trim()) {
@@ -121,19 +253,18 @@ function ChatbotPage() {
     setMessages((prev) => [...prev, newMessage]);
     setLoading(true);
     setError(null);
+    setSelectedSuggestion(null); // Reset selection after sending
 
     try {
-        // Send the user's message to the chat model
-        const result = await chat.sendMessage(inputText);
-        const rawText = await result.response.text(); // Get the raw text response
 
-        // Format the response text (e.g., replace markdown with HTML)
+        const result = await chat.sendMessage(inputText);
+        const rawText = await result.response.text();
         const formattedText = rawText.replace(
             /\*\*(.*?)\*\*/g,
             "<strong>$1</strong>"
         );
 
-        // Create the AI's message object
+        
         const aiMessage = {
             text: formattedText,
             sender: "ai",
@@ -149,7 +280,7 @@ function ChatbotPage() {
         // Set error state and attempt to reinitialize the chat
         setError("Failed to process your message. Please try again.");
         console.error("Error while processing message:", err);
-        await initializeChat(); // Reinitialize chat on failure
+        await initializeChat();
     } finally {
         // Reset loading state and clear the input text
         setLoading(false);
@@ -267,26 +398,67 @@ function ChatbotPage() {
         whileInView={{ opacity: 1, y: 0 }}
         initial={{ opacity: 0, y: -100 }}
         transition={{ duration: 1.5 }}
-        className="max-w-7xl w-full h-full bg-gray-100 shadow-md rounded-lg p-4 flex"
+        className="max-w-7xl w-full h-full bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl rounded-lg p-4 flex"
       >
         {!nameSubmitted ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <h2 className="text-xl font-semibold mb-4">
-              Before we begin, what's your name?
-            </h2>
-            <input
-              type="text"
-              placeholder="Enter your name"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              className="p-2 border border-gray-300 rounded-lg mb-4"
-            />
-            <button
-              onClick={handleNameSubmit}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          <div className="w-full flex justify-center items-center">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6"
             >
-              Start Conversation
-            </button>
+              {/* Logo and Header */}
+              <div className="text-center space-y-4">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3, type: "spring", stiffness: 150 }}
+                >
+                  <img
+                    src="/src/assets/web_logo.jpeg"
+                    alt="Lumina AI"
+                    className="w-24 h-24 mx-auto rounded-full shadow-lg object-cover"
+                  />
+                </motion.div>
+                <h1 className="text-3xl font-bold text-gray-800">Welcome to Lumina</h1>
+                <p className="text-gray-600">Your AI Therapeutic Companion</p>
+              </div>
+
+              {/* Name Input Section */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-6"
+              >
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    What should I call you?
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors duration-200"
+                  />
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleNameSubmit}
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-xl font-semibold shadow-md hover:from-blue-600 hover:to-blue-700 transition-all duration-200"
+                >
+                  Begin Your Journey
+                </motion.button>
+
+                <p className="text-center text-sm text-gray-500">
+                  Your safe space for open conversation and support
+                </p>
+              </motion.div>
+            </motion.div>
           </div>
         ) : (
           <>
@@ -324,16 +496,14 @@ function ChatbotPage() {
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`message ${
-                      message.sender === "user" ? "user" : "ai"
-                    }`}
+                    className={`message ${message.sender === "user" ? "user" : "ai"
+                      }`}
                   >
                     <div
-                      className={`p-4 rounded-lg mb-4 ${
-                        message.sender === "user"
+                      className={`p-4 rounded-lg mb-4 ${message.sender === "user"
                           ? "bg-blue-200 text-right"
                           : "bg-green-200 text-left"
-                      }`}
+                        }`}
                     >
                       {message.sender === "ai" ? (
                         <p
@@ -352,16 +522,44 @@ function ChatbotPage() {
                 {loading && <p className="text-center text-gray-600">Loading...</p>}
                 {error && <p className="text-center text-red-600">{error}</p>}
               </div>
+                {messages.length === 1 && (
+                  <div className="mb-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      {currentSuggestions.map((suggestion, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          onClick={() => handleSuggestionClick(suggestion.prompt)}
+                          className={`bg-white p-3 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow flex items-center space-x-2 border border-gray-200 
+                  ${selectedSuggestion === suggestion.prompt ? 'ring-2 ring-blue-500' : ''}`}
+                        >
+                          <span className="text-xl">{suggestion.icon}</span>
+                          <span className="text-sm text-gray-700">{suggestion.title}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                      onClick={() => setCurrentSuggestions(getRandomSuggestions())}
+                      className="mt-3 w-full text-sm text-blue-500 hover:text-blue-600 transition-colors duration-200 py-2 px-4 rounded-lg border border-blue-200 hover:border-blue-300 bg-blue-50 hover:bg-blue-100"
+                    >
+                      Show different suggestions
+                    </motion.button>
+                  </div>
+                )}
 
               {/* Input Section */}
               <div className="flex items-center border rounded-lg p-2 bg-gray-50">
                 <button
                   onClick={startListening}
-                  className={`p-2 rounded-lg mr-2 ${
-                    isListening
+                  className={`p-2 rounded-lg mr-2 ${isListening
                       ? "bg-green-400 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                    }`}
                   aria-label="Voice Input"
                 >
                   <GiSpeaker className="h-5 w-5" />
