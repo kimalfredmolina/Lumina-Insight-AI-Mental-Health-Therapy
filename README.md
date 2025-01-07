@@ -1,4 +1,4 @@
-# Lumina AI Mental Health Companion
+# Lumina-Insigh-AI-Mental-Health-Therapy
 
 ### Your Trusted Partner for Emotional Support and Guidance with AI Technology
 
@@ -35,6 +35,13 @@ https://react-icons.github.io/react-icons/
 
 ```
 npm install react-icons --save
+```
+
+Free React.js Icons
+https://lucide.dev/guide/packages/lucide-react
+
+```
+npm install lucide-react
 ```
 
 For Animation in React.js

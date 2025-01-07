@@ -157,7 +157,8 @@ function ChatbotPage() {
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -240,14 +241,13 @@ function ChatbotPage() {
     }
   };
 
-
   const handleResponse = async () => {
     if (!inputText.trim()) return;
 
     const newMessage = {
-        text: inputText,
-        sender: "user",
-        timestamp: new Date(),
+      text: inputText,
+      sender: "user",
+      timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, newMessage]);
@@ -256,37 +256,33 @@ function ChatbotPage() {
     setSelectedSuggestion(null); // Reset selection after sending
 
     try {
+      const result = await chat.sendMessage(inputText);
+      const rawText = await result.response.text(); 
 
-        const result = await chat.sendMessage(inputText);
-        const rawText = await result.response.text();
-        const formattedText = rawText.replace(
-            /\*\*(.*?)\*\*/g,
-            "<strong>$1</strong>"
-        );
+      const formattedText = rawText.replace(
+        /\*\*(.*?)\*\*/g,
+        "<strong>$1</strong>"
+      );
 
-        
-        const aiMessage = {
-            text: formattedText,
-            sender: "ai",
-            timestamp: new Date(),
-        };
+      const aiMessage = {
+        text: formattedText,
+        sender: "ai",
+        timestamp: new Date(),
+      };
 
-        // Add the AI's response to the chat history
-        setMessages((prev) => [...prev, aiMessage]);
-
-        // Trigger text-to-speech for the AI's response
-        textToSpeech(rawText);
+      // Add the AI's response to the chat history
+      setMessages((prev) => [...prev, aiMessage]);
+      textToSpeech(rawText);
     } catch (err) {
         // Set error state and attempt to reinitialize the chat
         setError("Failed to process your message. Please try again.");
         console.error("Error while processing message:", err);
         await initializeChat();
     } finally {
-        // Reset loading state and clear the input text
-        setLoading(false);
-        setInputText("");
+      setLoading(false);
+      setInputText("");
     }
-};
+  };
 
   // Text-to-Speech response of AI
   const textToSpeech = (text) => {
@@ -519,7 +515,9 @@ function ChatbotPage() {
                     </div>
                   </div>
                 ))}
-                {loading && <p className="text-center text-gray-600">Loading...</p>}
+                {loading && (
+                  <p className="text-center text-gray-600">Loading...</p>
+                )}
                 {error && <p className="text-center text-red-600">{error}</p>}
               </div>
                 {messages.length === 1 && (
