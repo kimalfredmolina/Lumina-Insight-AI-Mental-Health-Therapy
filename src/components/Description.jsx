@@ -107,7 +107,11 @@ const Description = () => {
         transition={{ duration: 0.8 }}
         className="max-w-4xl mx-auto mt-16 px-4 mb-16 w-full"
       >
-        <div className="text-center mb-12">
+        <motion.div 
+         whileInView={{opacity: 1, y: 0}}
+         initial={{opacity: 0 , y: -100}}
+         transition={{duration: 1.5}}
+         className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <HelpCircle className="w-8 h-8 mt-32 text-purple-500 mr-2" />
             <h2 className="text-3xl font-bold mt-32 text-gray-800">Frequently Asked Questions</h2>
@@ -115,7 +119,7 @@ const Description = () => {
           <p className="text-gray-600 max-w-2xl mx-auto">
             Find answers to common questions about our AI Mental Health Assistant and how it can support your well-being journey.
           </p>
-        </div>
+        </motion.div>
       
         <div className="space-y-6">
           {faqs.map((faq, index) => (
@@ -124,7 +128,7 @@ const Description = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
+              className="border border-red-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
             >
               <button
                 onClick={() => toggleQuestion(index)}
