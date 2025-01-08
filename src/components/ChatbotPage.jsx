@@ -190,12 +190,10 @@ function ChatbotPage() {
   }, [messages]);
 
   const handleSuggestionClick = (prompt) => {
-    // If this suggestion is already selected and in the input box, send it
     if (selectedSuggestion === prompt && inputText === prompt) {
       handleResponse();
       setSelectedSuggestion(null); // Reset selection after sending
     } else {
-      // First click - just put it in the input box
       setShowSuggestions(false);
       setInputText(prompt);
       setSelectedSuggestion(prompt);
@@ -253,7 +251,7 @@ function ChatbotPage() {
     setMessages((prev) => [...prev, newMessage]);
     setLoading(true);
     setError(null);
-    setSelectedSuggestion(null); // Reset selection after sending
+    setSelectedSuggestion(null);
 
     try {
       const result = await chat.sendMessage(inputText);
@@ -270,11 +268,9 @@ function ChatbotPage() {
         timestamp: new Date(),
       };
 
-      // Add the AI's response to the chat history
       setMessages((prev) => [...prev, aiMessage]);
       textToSpeech(rawText);
     } catch (err) {
-        // Set error state and attempt to reinitialize the chat
         setError("Failed to process your message. Please try again.");
         console.error("Error while processing message:", err);
         await initializeChat();
@@ -287,7 +283,7 @@ function ChatbotPage() {
   // Text-to-Speech response of AI
   const textToSpeech = (text) => {
     if ("speechSynthesis" in window) {
-      const maxChunkSize = 150; // Adjust this to control chunk size or text to read
+      const maxChunkSize = 150; // adjust lng to kung ilan pwede basahin
       const utteranceQueue = [];
 
       for (let i = 0; i < text.length; i += maxChunkSize) {
@@ -298,8 +294,8 @@ function ChatbotPage() {
         if (utteranceQueue.length === 0) return;
 
         const utterance = new SpeechSynthesisUtterance(utteranceQueue.shift());
-        utterance.lang = "en-US"; // Set language
-        utterance.rate = 1; // Adjust speaking rate
+        utterance.lang = "en-US"; 
+        utterance.rate = 1; // speaking rate
         utterance.pitch = 1;
 
         const voices = window.speechSynthesis.getVoices();
@@ -351,7 +347,7 @@ function ChatbotPage() {
       window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
 
-    recognition.lang = "en-US"; // Set language
+    recognition.lang = "en-US";
     recognition.interimResults = false;
     recognitionRef.current = recognition;
 
@@ -377,7 +373,7 @@ function ChatbotPage() {
     recognition.start();
   };
 
-  // Stop speech synthesis when the page is refreshed or navigated away
+  // Stop speech when navigating pages
   useEffect(() => {
     window.onbeforeunload = () => {
       stopSpeechSynthesis();
@@ -494,7 +490,7 @@ function ChatbotPage() {
                   <div>
                     <h3 className="font-semibold text-gray-800">Lumina</h3>
                     <p className="text-sm text-gray-600">
-                      I'm Lumina who provides support, comfort and guidance, but remember, I'm not a substitute for professional help. If you're facing serious mental health concerns, please consult a licensed professional or seek immediate assistance from a trusted healthcare provider.
+                      I'm Lumina AI who provides support, comfort and guidance, but remember, I'm not a substitute for professional help. If you're facing serious mental health concerns, please consult a licensed professional or seek immediate assistance from a trusted healthcare provider.
                     </p>
                   </div>
                 </div>
