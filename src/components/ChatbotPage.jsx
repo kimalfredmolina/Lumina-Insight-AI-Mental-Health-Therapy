@@ -4,6 +4,7 @@ import { GoPaperclip } from "react-icons/go";
 import { FaArrowCircleUp } from "react-icons/fa";
 import { IoMdHome } from "react-icons/io";
 import { Link } from "react-router-dom";
+import logo from "../assets/web_logo.jpeg";
 import dayjs from "dayjs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { motion } from "framer-motion";
@@ -408,7 +409,7 @@ function ChatbotPage() {
                   transition={{ delay: 0.3, type: "spring", stiffness: 150 }}
                 >
                   <img
-                    src="/src/assets/web_logo.jpeg"
+                    src={logo}
                     alt="Lumina AI"
                     className="w-24 h-24 mx-auto rounded-full shadow-lg object-cover"
                   />
@@ -465,7 +466,7 @@ function ChatbotPage() {
                 </Link>
               </div>
               <img
-                src="/src/assets/web_logo.jpeg"
+                src={logo}
                 alt="AI Companion Icon"
                 className="w-80 h-80 rounded-3xl mt-16 object-cover mb-4"
               />
@@ -483,7 +484,7 @@ function ChatbotPage() {
                           <div className="bg-white p-4 rounded-lg shadow-md mb-4">
                 <div className="flex items-start space-x-3">
                   <img
-                    src="/src/assets/web_logo.jpeg"
+                    src={logo}
                     alt="Lumina"
                     className="w-10 h-10 rounded-full object-cover"
                   />
