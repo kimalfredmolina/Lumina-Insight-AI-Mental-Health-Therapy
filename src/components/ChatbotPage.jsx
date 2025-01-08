@@ -483,6 +483,22 @@ function ChatbotPage() {
 
             {/* Main Section */}
             <div className="flex flex-col w-full h-full">
+                          {/* Reminder Bubble */}
+                          <div className="bg-white p-4 rounded-lg shadow-md mb-4">
+                <div className="flex items-start space-x-3">
+                  <img
+                    src="/src/assets/web_logo.jpeg"
+                    alt="Lumina"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <h3 className="font-semibold text-gray-800">Lumina</h3>
+                    <p className="text-sm text-gray-600">
+                      I'm Lumina who provides support, comfort and guidance, but remember, I'm not a substitute for professional help. If you're facing serious mental health concerns, please consult a licensed professional or seek immediate assistance from a trusted healthcare provider.
+                    </p>
+                  </div>
+                </div>
+              </div>
               {/* Chat Container */}
               <div
                 className="flex-grow overflow-auto chat-container p-2 border rounded-lg bg-gray-50"
