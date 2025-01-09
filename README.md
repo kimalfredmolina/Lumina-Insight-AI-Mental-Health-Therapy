@@ -1,4 +1,4 @@
-# Lumina-Insigh-AI-Mental-Health-Therapy
+# Lumina Insight AI Mental Health Therapy
 
 ### Your Trusted Partner for Emotional Support and Guidance with AI Technology
 
